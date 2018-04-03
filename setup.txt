@@ -1,0 +1,30 @@
+# :colorscheme desert 
+  mkdir -p opt
+
+#--------------------
+# JDK 8
+#--------------------
+  cp download/jdk-8u161-linux-x64.tar.gz opt
+  cd opt && tar -xvf jdk-8u161-linux-x64.tar.gz && ln -s jdk1.8.0_161 jdk8 && cd ..
+
+#--------------------
+# CLOJURE & LEIN
+#--------------------
+  cp download/lein opt
+  chmod +x opt/lein
+  mkdir -p home/.lein/self-installs
+  cp download/leiningen-2.8.1-standalone.zip  home/.lein/self-installs/leiningen-2.8.1-standalone.jar
+
+#--------------------
+# EMACS 25
+#--------------------
+  cp download/emacs-25.3.tar.gz opt
+  cd opt && tar -xvf emacs-25.3.tar.gz && ln -s emacs-25.3 emacs25-src && cd ..
+  my=$(pwd) && cd opt/emacs25-src && ./configure --prefix=$my/opt/emacs25 --without-x && make && make install && cd ../..
+  # sudo apt-get install make gcc libncurses-dev
+  cp download/init.el home/.emacs.d/init.el
+  # package-list-packages
+  package-install paredit
+  package-install cider
+
+  

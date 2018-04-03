@@ -1,0 +1,15 @@
+java jdk8:
+  http://www.oracle.com/technetwork/java/javase/downloads/index.html  
+
+emacs:
+  package:
+    wget -O download/emacs-25.3.tar.gz http://mirrors.ustc.edu.cn/gnu/emacs/emacs-25.3.tar.gz
+  melpa: 
+    https://github.com/melpa/melpa > home/.emacs.d/init.el
+
+lein:
+  script:
+    wget -O download/lein https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein
+  jar:
+    export LEIN_VERSION="2.8.1"
+    wget -O download/leiningen-$LEIN_VERSION-standalone.zip https://github.com/technomancy/leiningen/releases/download/$LEIN_VERSION/leiningen-$LEIN_VERSION-standalone.zip
