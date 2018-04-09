@@ -13,3 +13,11 @@ lein:
   jar:
     export LEIN_VERSION="2.8.1"
     wget -O download/leiningen-$LEIN_VERSION-standalone.zip https://github.com/technomancy/leiningen/releases/download/$LEIN_VERSION/leiningen-$LEIN_VERSION-standalone.zip
+
+docker:
+  https://docs.docker.com/install/linux/docker-ce/ubuntu/
+
+zookeeper, kafka, redis:
+  wget -O download/zookeeper-3.4.11.tar.gz http://mirrors.hust.edu.cn/apache/zookeeper/zookeeper-3.4.11/zookeeper-3.4.11.tar.gz
+  wget -O download/kafka_2.11-1.1.0.tgz http://mirrors.tuna.tsinghua.edu.cn/apache/kafka/1.1.0/kafka_2.11-1.1.0.tgz
+  wget -O download/redis-4.0.9.tar.gz http://download.redis.io/releases/redis-4.0.9.tar.gz
