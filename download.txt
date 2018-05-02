@@ -1,6 +1,9 @@
 java jdk8:
   http://www.oracle.com/technetwork/java/javase/downloads/index.html  
 
+maven download:
+  wget -O download/apache-maven-3.5.3-bin.tar.gz https://mirrors.tuna.tsinghua.edu.cn/apache/maven/maven-3/3.5.3/binaries/apache-maven-3.5.3-bin.tar.gz
+
 emacs:
   package:
     wget -O download/emacs-25.3.tar.gz http://mirrors.ustc.edu.cn/gnu/emacs/emacs-25.3.tar.gz
