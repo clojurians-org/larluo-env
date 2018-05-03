@@ -1,4 +1,5 @@
 ```sh
+# sudo systemctl stop firewalld
 # :colorscheme desert 
   mkdir -p opt
 
@@ -102,26 +103,14 @@
     #------------------------
     # kafka/bin/kafka-server-start.sh kafka/config/server.properties
     #------------------------
-    #------------------------
-    # ${MY_IP}:9092
-    #------------------------
-    sudo mkdir -p /store/kafka/${MY_IP}_9092
+    sudo mkdir -p /store/kafka/{${MY_IP}_9092,${MY_IP}_9093,${MY_IP}_9094}
+
     sudo docker run --name kafka-test1 -it --net=host -p '0.0.0.0:9092:9092' -e PORT=9092 \
       -e SERVERS=$SERVERS -e ZK_URL=$ZK_URL -v /store/share:/store/share -v /store/kafka/${MY_IP}_9092:/store/kafka larluo/kafka:1.0 bash
-    #------------------------
-    # ${MY_IP}:9093
-    #------------------------
-    sudo mkdir -p /store/kafka/${MY_IP}_9093
     sudo docker run --name kafka-test2 -it --net=host -p '0.0.0.0:9093:9092' -e PORT=9093 \
       -e SERVERS=$SERVERS -e ZK_URL=$ZK_URL -v /store/share:/store/share -v /store/kafka/${MY_IP}_9093:/store/kafka larluo/kafka:1.0 bash
-
-    #------------------------
-    # ${MY_IP}:9094
-    #------------------------
-    sudo mkdir -p /store/kafka/${MY_IP}_9094
     sudo docker run --name kafka-test3 -it --net=host -p '0.0.0.0:9094:9092' -e PORT=9094 \
       -e SERVERS=$SERVERS -e ZK_URL=$ZK_URL -v /store/share:/store/share -v /store/kafka/${MY_IP}_9094:/store/kafka larluo/kafka:1.0 bash
-
 
     sudo docker run -d --name kafka_10.0.2.15_9092 -it --net=host -p '0.0.0.0:9092:9092' -e PORT=9092 \
       -e SERVERS=$SERVERS -e ZK_URL=$ZK_URL -v /store/share:/store/share -v /store/kafka/${MY_IP}_9092:/store/kafka larluo/kafka:1.0
@@ -130,10 +119,68 @@
     sudo docker run -d --name kafka_10.0.2.15_9094 -it --net=host -p '0.0.0.0:9094:9092' -e PORT=9094 \
       -e SERVERS=$SERVERS -e ZK_URL=$ZK_URL -v /store/share:/store/share -v /store/kafka/${MY_IP}_9094:/store/kafka larluo/kafka:1.0
 
+    #------------------------
+    # RUN
+    #------------------------
+    sudo mkdir -p /store/kafka/${MY_IP}_9092
     kafka-topics.sh --zookeeper localhost:2181/kafka_larluo --create --replication-factor 1 --partitions 1 --topic test
     kafka-topics.sh --zookeeper localhost:2181/kafka_larluo --list
     kafka-console-producer.sh --broker-list localhost:9092 --topic test
     kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test --from-beginning
+
+    #------------------------
+    # USE
+    #------------------------
+    mkdir -p opt.dist/kafka/config/fs_127.0.0.1
+    cp opt/kafka/config/connect-standalone.properties opt.dist/kafka/config/connect-standalone.properties
+    cp opt/kafka/config/connect-file-source.properties opt.dist/kafka/config/fs_127.0.0.1/test.txt.properties
+    connect-standalone.sh opt.dist/kafka/config/connect-standalone.properties opt.dist/kafka/config/fs_127.0.0.1/test.txt.properties
+
+    kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic connect-test --from-beginning
+
+  #==== REDIS ====
+    cp download/redis-4.0.9.tar.gz opt
+    cd opt && tar -xvf redis-4.0.9.tar.gz && ln -s redis-4.0.9 redis-src && \
+      cd redis-src && make && cd .. && \
+      mkdir -p redis-4.0.9-bin/bin && cp redis-src/src/{redis-server,redis-cli,redis-trib.rb} redis-4.0.9-bin/bin && \
+      ln -s redis-4.0.9-bin redis && \
+      tar -cvf redis-4.0.9-bin.tar redis-4.0.9-bin && gzip redis-4.0.9-bin.tar && cd ..
+
+    mkdir -p docker.dist/redis
+    cp docker/redis/* docker.dist/redis
+    cp opt/jdk-8u161-linux-x64.tar.gz docker.dist/redis
+    cp opt/redis-4.0.9-bin.tar.gz docker.dist/redis
+
+    #------------------------
+    # redis/bin/redis-server redis.conf
+    #------------------------
+    cd docker.dist/redis && sudo docker build -t larluo/redis:1.0 .
+
+    MY_IP=10.0.2.15
+    SERVERS="${MY_IP}:6379,${MY_IP}:6380,${MY_IP}:6381"
+
+    sudo mkdir -p /store/redis/{${MY_IP}_6379,${MY_IP}_6380,${MY_IP}_6381}
+    sudo docker run --name redis-test1 -it --net=host -p '0.0.0.0:6379:6379' -p '0.0.0.0:16379:16379' -e PORT=6379 \
+      -e SERVERS=$SERVERS -v /store/share:/store/share -v /store/redis/${MY_IP}_6379:/store/redis larluo/redis:1.0 bash
+    sudo docker run --name redis-test2 -it --net=host -p '0.0.0.0:6380:6379' -p '0.0.0.0:16380:16379' -e PORT=6380 \
+      -e SERVERS=$SERVERS -v /store/share:/store/share -v /store/redis/${MY_IP}_6380:/store/redis larluo/redis:1.0 bash
+    sudo docker run --name redis-test3 -it --net=host -p '0.0.0.0:6381:6379' -p '0.0.0.0:16381:16379' -e PORT=6381 \
+      -e SERVERS=$SERVERS -v /store/share:/store/share -v /store/redis/${MY_IP}_6381:/store/redis larluo/redis:1.0 bash
+
+    sudo docker run -d --name redis_6379 -it --net=host -p '0.0.0.0:6379:6379' -p '0.0.0.0:16379:16379' -e PORT=6379 \
+      -e SERVERS=$SERVERS -v /store/share:/store/share -v /store/redis/${MY_IP}_6379:/store/redis larluo/redis:1.0
+    sudo docker run -d --name redis_6380 -it --net=host -p '0.0.0.0:6380:6379' -p '0.0.0.0:16380:16379' -e PORT=6380 \
+      -e SERVERS=$SERVERS -v /store/share:/store/share -v /store/redis/${MY_IP}_6380:/store/redis larluo/redis:1.0
+    sudo docker run -d --name redis_6381 -it --net=host -p '0.0.0.0:6381:6379' -p '0.0.0.0:16381:16379' -e PORT=6381 \
+      -e SERVERS=$SERVERS -v /store/share:/store/share -v /store/redis/${MY_IP}_6381:/store/redis larluo/redis:1.0
+
+    redis-trib.rb create ${MY_IP}:6379 ${MY_IP}:6380 ${MY_IP}:6381
+
+    #------------------------
+    # RUN
+    #------------------------
+    sudo apt install ruby
+    sudo gem install redis
 
   #==== MSTR ====
   if ! sudo grep 'larluo' /etc/sudoers > /dev/null; then echo "larluo ALL=(ALL) NOPASSWD: ALL" | sudo tee -a /etc/sudoers; fi
