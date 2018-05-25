@@ -1,44 +1,53 @@
 ```sh
 # sudo systemctl stop firewalld
 # :colorscheme desert 
+
+#--------------------
+# CORE
+#--------------------
   mkdir -p opt
+  sudo apt-get install gcc
+  sudo apt-get install libgmp-dev
 
 #--------------------
-# JDK 8
+# UTILIZE
 #--------------------
-  cp download/jdk-8u161-linux-x64.tar.gz opt
-  cd opt && tar -xvf jdk-8u161-linux-x64.tar.gz && ln -s jdk1.8.0_161 jdk8 && cd ..
+  sudo apt-get install chromium-browser
+  sudo apt-get install libgconf2-4
+  wget -O opt/linux-x64.tar.gz https://github.com/geeeeeeeeek/electronic-wechat/releases/download/V2.0/linux-x64.tar.gz
 
 #--------------------
-# MAVEN
+# ENV INITIAL
 #--------------------
-  cp download/apache-maven-3.5.3-bin.tar.gz opt
-  cd opt && tar -xvf apache-maven-3.5.3-bin.tar.gz && ln -s apache-maven-3.5.3 mvn3 && cd ..
+  sudo apt-get install curl
 
-#--------------------
-# CLOJURE & LEIN
-#--------------------
-  cp download/lein opt
-  chmod +x opt/lein
-  mkdir -p home/.lein/self-installs
-  cp download/leiningen-2.8.1-standalone.zip  home/.lein/self-installs/leiningen-2.8.1-standalone.jar
+  -- nix & proxy
+  bash <(curl https://nixos.org/nix/install)
+  nix-env -i shadowsocks-libev
+  sudo sslocal -c my/shadowsocks.json -d start
+  sudo apt-get install privoxy
+  curl --socks5 127.0.0.1:1080 http://www.google.com
+  curl --proxy http://127.0.0.1:8118 http://www.google.com
+  /etc/init.d/privoxy start
 
-#--------------------
-# HASKELL & STACK 
-#--------------------
-  curl -sSL https://get.haskellstack.org/ | sh
 
-#--------------------
-# EMACS 25
-#--------------------
-  cp download/emacs-25.3.tar.gz opt
-  cd opt && tar -xvf emacs-25.3.tar.gz && ln -s emacs-25.3 emacs25-src && cd ..
-  my=$(pwd) && cd opt/emacs25-src && ./configure --prefix=$my/opt/emacs25 --without-x && make && make install && cd ../..
-  # sudo apt-get install make gcc libncurses-dev
+  --------------------------------------------------
+  - jdk, maven, git, emacs, clojure haskell, nodejs
+  --------------------------------------------------
+  nix-env -i openjdk-8u172b11
+  nix-env -i apache-maven-3.5.3
+  nix-env -i git-with-svn
+
+  nix-env -i emacs
   cp download/init.el home/.emacs.d/init.el
   # package-list-packages
   package-install paredit
   package-install cider
+
+  nix-env -i leiningen
+  nix-env -i stack
+  nix-env -i nodejs
+
 
 #--------------------
 # DOCKER 
@@ -192,6 +201,7 @@
   sudo yum install krb5-libs.i686
   sudo yum install nss-pam-ldapd.i686
   sudo yum install ksh.x86_64
+
 #--------------------
 # ETHEREUM
 #--------------------
@@ -219,13 +229,4 @@
   export MB_PLUGINS_DIR=opt/metabase.plugins
   java -jar opt/metabase.jar
 
-#--------------------
-# SHADOWSOCKS
-#--------------------
-  sudo $(pwd)/home/.local/bin/sslocal -c my/shadowsocks.json -d start
-
-#--------------------
-# NIX: https://nixos.org/nix/manual/
-#--------------------
-  bash <(curl https://nixos.org/nix/install)
 ```
