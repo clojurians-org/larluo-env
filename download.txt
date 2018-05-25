@@ -24,3 +24,9 @@ zookeeper, kafka, redis:
   wget -O download/zookeeper-3.4.11.tar.gz http://mirrors.hust.edu.cn/apache/zookeeper/zookeeper-3.4.11/zookeeper-3.4.11.tar.gz
   wget -O download/kafka_2.11-1.1.0.tgz http://mirrors.tuna.tsinghua.edu.cn/apache/kafka/1.1.0/kafka_2.11-1.1.0.tgz
   wget -O download/redis-4.0.9.tar.gz http://download.redis.io/releases/redis-4.0.9.tar.gz
+
+metabase:
+  wget -O download/metabase.jar http://downloads.metabase.com/v0.29.3/metabase.jar
+
+go:
+  wget -O download/go1.10.2.linux-amd64.tar.gz https://dl.google.com/go/go1.10.2.linux-amd64.tar.gz

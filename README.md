@@ -192,5 +192,40 @@
   sudo yum install krb5-libs.i686
   sudo yum install nss-pam-ldapd.i686
   sudo yum install ksh.x86_64
+#--------------------
+# ETHEREUM
+#--------------------
+  cp download/go1.10.2.linux-amd64.tar.gz opt
+  cd opt && tar -xvf go1.10.2.linux-amd64.tar.gz && cd ..
+  
 
+#--------------------
+# CARDANO
+#--------------------
+  stack install cpphs
+  sudo apt-get install librocksdb-dev
+  sudo apt-get install liblzma-dev
+  sudo apt-get install libssl-dev
+
+  .stack-work/install/x86_64-linux/lts-9.1/8.0.2/bin/cardano-launcher --config larluo.launcher-config.yaml
+
+  #==== IELE ====
+  https://github.com/runtimeverification/iele-semantics/blob/master/INSTALL.md
+  sudo apt-get install virtualenv
+
+#--------------------
+# METABASE
+#--------------------
+  export MB_PLUGINS_DIR=opt/metabase.plugins
+  java -jar opt/metabase.jar
+
+#--------------------
+# SHADOWSOCKS
+#--------------------
+  sudo $(pwd)/home/.local/bin/sslocal -c my/shadowsocks.json -d start
+
+#--------------------
+# NIX: https://nixos.org/nix/manual/
+#--------------------
+  bash <(curl https://nixos.org/nix/install)
 ```
