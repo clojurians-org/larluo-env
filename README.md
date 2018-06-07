@@ -191,16 +191,22 @@
     sudo apt install ruby
     sudo gem install redis
 
-  #==== MSTR ====
-  if ! sudo grep 'larluo' /etc/sudoers > /dev/null; then echo "larluo ALL=(ALL) NOPASSWD: ALL" | sudo tee -a /etc/sudoers; fi
+  #==== ELASTICSEARCH ====
+  cd download.bin && unzip elasticsearch-6.2.4.zip && cd ..
+  cd opt && ln -s ../download.bin/elasticsearch-6.2.4 elasticsearch && cd ..
 
-  sudo yum install compat-libstdc++-33.i686
-  sudo yum install libXp.x86_64
-  sudo yum install elfutils-devel.x86_64
-  sudo yum install libstdc++
-  sudo yum install krb5-libs.i686
-  sudo yum install nss-pam-ldapd.i686
-  sudo yum install ksh.x86_64
+  /etc/security/limits.conf {
+    oper               soft    nproc           4096
+  }
+  /etc/ssh/sshd_config {
+    UseLogin yes
+  }
+  export ES_JAVA_OPTS="-Xms10g -Xmx10g"
+  export ES_PATH_CONF="opt.conf/elasticsearch/9200"
+  opt/elasticsearch/bin/elasticsearch -Epath.data=$(pwd)/opt.var/data/elasticsearch/9200 -Epath.logs=$(pwd)/opt.var/log/elasticsearch/9200 -d
+
+  curl localhost:9200/_nodes/stats/jvm?pretty=true
+  
 
 #--------------------
 # ETHEREUM

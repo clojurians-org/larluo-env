@@ -1,0 +1,9 @@
+cluster.name: sit-es
+node.name: X.X.X.X_9200
+network.bind_host: X.X.X.X
+network.publish_host: X.X.X.X
+http.port: 9200
+transport.tcp.port: 9300
+discovery.zen.ping.unicast.hosts: ["X.X.X.X:9300", "X.X.X.X:9300", "X.X.X.X:9300"]
+bootstrap.system_call_filter: false
+
