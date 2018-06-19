@@ -20,14 +20,18 @@ lein:
 docker:
   https://docs.docker.com/install/linux/docker-ce/ubuntu/
 
-zookeeper, kafka, redis, elasticsearch:
+zookeeper, kafka, redis, elasticsearch, kibana:
   wget -O download.bin/zookeeper-3.4.11.tar.gz http://mirrors.hust.edu.cn/apache/zookeeper/zookeeper-3.4.11/zookeeper-3.4.11.tar.gz
   wget -O download.bin/kafka_2.11-1.1.0.tgz http://mirrors.tuna.tsinghua.edu.cn/apache/kafka/1.1.0/kafka_2.11-1.1.0.tgz
   wget -O download.bin/redis-4.0.9.tar.gz http://download.redis.io/releases/redis-4.0.9.tar.gz
   wget -O download.bin/elasticsearch-6.2.4.zip https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.2.4.zip
+  wget -O download.bin/kibana-6.2.4-linux-x86_64.tar.gz https://artifacts.elastic.co/downloads/kibana/kibana-6.2.4-linux-x86_64.tar.gz
 
 metabase:
-  wget -O download/metabase.jar http://downloads.metabase.com/v0.29.3/metabase.jar
+  wget -O download.bin/metabase.jar http://downloads.metabase.com/v0.29.3/metabase.jar
 
 go:
-  wget -O download/go1.10.2.linux-amd64.tar.gz https://dl.google.com/go/go1.10.2.linux-amd64.tar.gz
+  wget -O download.bin/go1.10.2.linux-amd64.tar.gz https://dl.google.com/go/go1.10.2.linux-amd64.tar.gz
+
+confluent:
+  wget -O download.bin/confluent-oss-4.1.1-2.11.tar.gz http://packages.confluent.io/archive/4.1/confluent-oss-4.1.1-2.11.tar.gz

@@ -56,8 +56,7 @@
   mkdir -p docker.dist
   sudo sh -c "ifconfig > /store/share/ifconfig.out"
   #==== ZOOKEEPER ====
-    cp download/zookeeper-3.4.11.tar.gz opt
-    cd opt && tar -xvf zookeeper-3.4.11.tar.gz && ln -s zookeeper-3.4.11 zookeeper && cd ..
+    nix-env -i zookeeper
 
     mkdir -p docker.dist/zookeeper
     cp docker/zookeeper/* docker.dist/zookeeper
@@ -96,9 +95,8 @@
       -e SERVERS=$SERVERS -v /store/share:/store/share -v /store/zookeeper/${MY_IP}_2183_2890_3890:/store/zookeeper larluo/zookeeper:1.0
 
   #==== KAFKA ====
-    cp download/kafka_2.11-1.1.0.tgz opt
-    cd opt && tar -xvf kafka_2.11-1.1.0.tgz && ln -s kafka_2.11-1.1.0 kafka && cd ..
-
+    nix-env -i apache-kafka
+    
     mkdir -p docker.dist/kafka
     cp docker/kafka/* docker.dist/kafka
     cp download/jdk-8u161-linux-x64.tar.gz docker.dist/kafka
@@ -143,18 +141,13 @@
     mkdir -p opt.dist/kafka/config/fs_127.0.0.1
     cp opt/kafka/config/connect-standalone.properties opt.dist/kafka/config/connect-standalone.properties
     cp opt/kafka/config/connect-file-source.properties opt.dist/kafka/config/fs_127.0.0.1/test.txt.properties
-    connect-standalone.sh opt.dist/kafka/config/connect-standalone.properties opt.dist/kafka/config/fs_127.0.0.1/test.txt.properties
+    connect-standalone.sh opt.conf/kafka/config/connect-standalone.properties opt.conf/kafka/config/fs_127.0.0.1/test.txt.properties
 
     kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic connect-test --from-beginning
 
   #==== REDIS ====
-    cp download/redis-4.0.9.tar.gz opt
-    cd opt && tar -xvf redis-4.0.9.tar.gz && ln -s redis-4.0.9 redis-src && \
-      cd redis-src && make && cd .. && \
-      mkdir -p redis-4.0.9-bin/bin && cp redis-src/src/{redis-server,redis-cli,redis-trib.rb} redis-4.0.9-bin/bin && \
-      ln -s redis-4.0.9-bin redis && \
-      tar -cvf redis-4.0.9-bin.tar redis-4.0.9-bin && gzip redis-4.0.9-bin.tar && cd ..
-
+    cp download.src/redis-4.0.9.tar.gz opt
+    
     mkdir -p docker.dist/redis
     cp docker/redis/* docker.dist/redis
     cp opt/jdk-8u161-linux-x64.tar.gz docker.dist/redis
@@ -201,23 +194,46 @@
   /etc/ssh/sshd_config {
     UseLogin yes
   }
+  sudo service sshd restart
   export ES_JAVA_OPTS="-Xms10g -Xmx10g"
   export ES_PATH_CONF="opt.conf/elasticsearch/9200"
   opt/elasticsearch/bin/elasticsearch -Epath.data=$(pwd)/opt.var/data/elasticsearch/9200 -Epath.logs=$(pwd)/opt.var/log/elasticsearch/9200 -d
 
-  curl localhost:9200/_nodes/stats/jvm?pretty=true
-  
+  curl 10.132.37.48:9200/_cluster/health?pretty=true
+  curl 10.132.37.48:9200/_cat/indices?v
+  curl 10.132.37.48:9200/_nodes/stats/jvm?pretty=true
 
+  # XPACK
+  opt/kibana/bin/kibana -e http://10.132.37.48:9200 -H 10.132.37.48
+  # KIBANA
+  cd download.bin && tar -xvf kibana-6.2.4-linux-x86_64.tar.gz && cd ..
+  cd opt && ln -s ../download.bin/kibana-6.2.4-linux-x86_64 kibana && cd ..
+
+  # confluent
+  ln -s ../download.bin/confluent-4.1.1 confluent
+
+  kafka-topics.sh --zookeeper 10.132.37.37:2181 --create --replication-factor 1 --partitions 1 --topic larluo-es
+  opt/confluent/bin/connect-standalone opt.conf/kafka-connect/kafka_10.132.37.47.properties opt.conf/kafka-connect/es_10.132.37.48/larluo.properties
+
+  opt/confluent/bin/zookeeper-server-start opt/confluent/etc/kafka/zookeeper.properties
+  opt/confluent/bin/kafka-server-start opt/confluent/etc/kafka/server.properties
 #--------------------
-# ETHEREUM
+# BLOCKCHAIN
 #--------------------
+  #====> ripple
+  wget https://dl.bintray.com/boostorg/release/1.67.0/source/boost_1_67_0.tar.gz
+  ./bootstrap.sh && ./b2
+  export BOOT_ROOT=boost_1_67_0
+  git clone https://github.com/ripple/rippled.git
+  mkdir dist && cd dist && cmake .. && make
+
+
+  #====> ETHEREUM
   cp download/go1.10.2.linux-amd64.tar.gz opt
   cd opt && tar -xvf go1.10.2.linux-amd64.tar.gz && cd ..
   
 
-#--------------------
-# CARDANO
-#--------------------
+  #====> CARDANO
   stack install cpphs
   sudo apt-get install librocksdb-dev
   sudo apt-get install liblzma-dev
