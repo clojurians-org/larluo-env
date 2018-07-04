@@ -252,3 +252,18 @@
   java -jar opt/metabase.jar
 
 ```
+
+
+
+#================
+# NixOS
+#================
+wpa_supplicant -B -iwlp7s0 -c <(wpa_passphrase 'Shrbank' '')
+wpa_supplicant -B -iwlp7s0 -c <(wpa_passphrase 'hl03863' '@hl03863')
+wpa_supplicant -s -u -Dnl80211,wext -c opt.conf/wpa_supplicant.conf -iwlp7s0
+
+ss-local -s hk3.wormholex.online -p 13173 -k ewxm9l -m rc4-md5 -b 0.0.0.0 -l 1080 -v
+./polipo socksParentsPRoxy=localhost:1080
+
+
+chromium --proxy-server=socks5://localhost:1080
